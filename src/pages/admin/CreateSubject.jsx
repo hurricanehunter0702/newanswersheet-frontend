@@ -47,7 +47,7 @@ const CreateSubject = () => {
                 'Content-Type': 'multipart/form-data'
             }
         });
-        if (data.success) {
+        if (data.status) {
             toast.success(data.msg);
             resetForm();
             setFile(null);

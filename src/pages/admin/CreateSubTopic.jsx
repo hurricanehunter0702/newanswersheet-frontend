@@ -12,10 +12,12 @@ const CreateSubTopic = () => {
   const navigate = useNavigate()
   const [years, setYears] = useState([])
   const [subjects, setSubjects] = useState([])
+  const [modules, setModules] = useState([])
   const [topics, setTopics] = useState([])
   const [subTopic, setSubTopic] = useState({
     year: '',
     subject: '',
+    module: '',
     topic: '',
     name: '',
     content: '',
@@ -24,48 +26,72 @@ const CreateSubTopic = () => {
   const validationSchema = yup.object({
     year: yup.string('Choose a year.').required('Year is required.'),
     subject: yup.string('Choose a subject.').required('Subject is required'),
+    module: yup.string('Choose a module.').required('Module is required.'),
     topic: yup.string('Choose a topic.').required('Topic is required.'),
     name: yup
       .string('Enter a sub topic name.')
       .test('len', 'Must be less than 64 characters.', function (val) {
-        if (!val) val = "";
+        if (!val) val = ''
         return val.length < 64
       })
       .required('Please enter a name.')
   })
-  useEffect(() => {}, [])
   useEffect(() => {
-    const getYears = async () => {
+    ;(async () => {
       let { data } = await Http.get('/admin/years/get-all-populate')
       setYears(data)
       setSubjects(data.length ? data[0].subjects : [])
+      setModules(
+        data.length && data[0].subjects.length
+          ? data[0].subjects[0].modules
+          : []
+      )
       setTopics(
-        data.length && data[0].subjects.length ? data[0].subjects[0].topics : []
+        data.length &&
+          data[0].subjects.length &&
+          data[0].subjects[0].modules.length
+          ? data[0].subjects[0].modules[0].topics
+          : []
       )
       setSubTopic({
         ...subTopic,
         year: data.length ? data[0]._id : '',
         subject:
           data.length && data[0].subjects.length ? data[0].subjects[0]._id : '',
+        module:
+          data.length &&
+          data[0].subjects.length &&
+          data[0].subjects[0].modules.length
+            ? data[0].subjects[0].modules[0]._id
+            : '',
         topic:
           data.length &&
           data[0].subjects.length &&
-          data[0].subjects[0].topics.length
-            ? data[0].subjects[0].topics[0]._id
+          data[0].subjects[0].modules.length &&
+          data[0].subjects[0].modules[0].topics.length
+            ? data[0].subjects[0].modules[0].topics[0]._id
             : ''
       })
-    }
-    getYears()
+    })()
   }, [])
 
   const onChangeYear = ev => {
     let idx = years.findIndex(year => year._id === ev.target.value)
     setSubjects(years[idx].subjects)
-    setTopics(years[idx].subjects.length ? years[idx].subjects[0].topics : [])
+    setModules(years[idx].subjects.length ? years[idx].subjects[0].modules : [])
+    setTopics(
+      years[idx].subjects.length && years[idx].subjects[0].modules.length
+        ? years[idx].subjects[0].modules[0].topics
+        : []
+    )
     setSubTopic({
       ...subTopic,
       year: ev.target.value,
       subject: years[idx].subjects.length ? years[idx].subjects[0]._id : '',
+      module:
+        years[idx].subjects.length && years[idx].subjects[0].modules.length
+          ? years[idx].subjects[0].modules[0]._id
+          : '',
       topic:
         years[idx].subjects.length && years[idx].subjects[0].topics.length
           ? years[idx].subjects[0].topics[0]._id
@@ -75,14 +101,31 @@ const CreateSubTopic = () => {
 
   const onChangeSubject = ev => {
     let idx = subjects.findIndex(subject => subject._id === ev.target.value)
-    setTopics(subjects[idx].topics)
+    setModules(subjects[idx].modules)
+    setTopics(
+      subjects[idx].modules.length ? subjects[idx].modules[0].topics : []
+    )
     setSubTopic({
       ...subTopic,
       subject: ev.target.value,
-      topic: subjects[idx].topics.length ? subjects[idx].topics[0]._id : ''
+      module: subjects[idx].modules.length ? subjects[idx].modules[0]._id : '',
+      topic:
+        subjects[idx].modules.length && subjects[idx].modules[0].topics.length
+          ? subjects[idx].modules[0].topics[0]._id
+          : ''
     })
   }
 
+  const onChangeModule = ev => {
+    let idx = modules.findIndex(module => module._id === ev.target.value)
+    setTopics(modules[idx].topics)
+    setSubTopic({
+      ...subTopic,
+      module: ev.target.value,
+      topic: modules[idx].topics.length ? modules[idx].topics[0]._id : ''
+    })
+  }
+  
   const onChangeTopic = ev => {
     setSubTopic({
       ...subTopic,
@@ -177,6 +220,26 @@ const CreateSubTopic = () => {
                 </Form.Control.Feedback>
               </Form.Group>
               <Form.Group className='mb-3'>
+                <Form.Label>Module:</Form.Label>
+                <Form.Select
+                  name='module'
+                  value={values.module}
+                  onChange={onChangeModule}
+                  onBlur={handleBlur}
+                  touched={touched}
+                  isInvalid={!!errors.module}
+                >
+                  {modules.map((module, idx) => (
+                    <option key={idx} value={module._id}>
+                      {module.name}
+                    </option>
+                  ))}
+                </Form.Select>
+                <Form.Control.Feedback type='invalid'>
+                  {errors.module}
+                </Form.Control.Feedback>
+              </Form.Group>
+              <Form.Group className='mb-3'>
                 <Form.Label>Topic:</Form.Label>
                 <Form.Select
                   name='topic'
@@ -265,7 +328,7 @@ const CreateSubTopic = () => {
                       'table',
                       'link',
                       'media',
-                      'codesample',
+                      'codesample'
                     ],
                     toolbar:
                       'undo redo | formatselect | ' +
@@ -273,22 +336,6 @@ const CreateSubTopic = () => {
                       'alignright alignjustify | bullist numlist outdent indent | ' +
                       'removeformat | grid_insert | tiny_mce_wiris_formulaEditor tiny_mce_wiris_formulaEditorChemistry | help',
                     draggable_modal: true,
-                    // init_instance_callback: function(editor) {
-                    //     editor.contentWindow.addEventListener("copy", function(ev) {
-                    //         ev.preventDefault()
-                    //     });
-                    //     editor.contentWindow.addEventListener("paste", function(ev) {
-                    //         ev.preventDefault();
-                    //     });
-                    //     editor.contentWindow.addEventListener("keydown", function(ev) {
-                    //         if((ev.ctrlKey || ev.metaKey) && (ev.key === "p" || ev.charCode === 16 || ev.charCode === 112 || ev.keyCode === 80) ){
-                    //             ev.cancelBubble = true;
-                    //             ev.preventDefault();
-                    //             ev.stopImmediatePropagation();
-                    //         }  
-                    //     })
-                        
-                    // },
                     content_style:
                       'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
                   }}

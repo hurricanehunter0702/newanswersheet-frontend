@@ -80,7 +80,7 @@ const Subjects = () => {
     }
     const deleteSubject = async () => {
         let { data } = await Http.delete(`admin/subjects/${subject._id}`);
-        if (data.success) {
+        if (data.status) {
             setIsGetData(!isGetData);
             setShowDeleteModal(false);
             toast.success(data.msg);

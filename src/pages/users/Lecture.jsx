@@ -23,6 +23,7 @@ const Lecture = () => {
         params: {
           year_slug: year,
           subject_slug: subject,
+          module_slug: module,
           topic_slug: topic,
           subtopic_slug: subtopic
         }
@@ -35,7 +36,6 @@ const Lecture = () => {
           if (user._id) setSubTopic(data.data);
           else {
             toast.info("Sign up to view this for free.");
-            // navigate("/login");
           }
         } else if (Number(permission) === 2) {
           if (user._id) {
@@ -46,7 +46,6 @@ const Lecture = () => {
             }
           } else {
             toast.info('Sign up to view.')
-            // navigate("/login");
           }
         }
         setTimeout(() => dispatch(setLoading(false)), 1500)
@@ -118,7 +117,6 @@ const Lecture = () => {
               className='mt-3 lecture-content'
               dangerouslySetInnerHTML={{ __html: subTopic.content }}
             ></div>
-            <input />
           </Card.Body>
         </Card>
       </Container>

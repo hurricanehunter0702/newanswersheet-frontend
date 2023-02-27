@@ -1,16 +1,18 @@
 import { useState, useEffect } from "react";
-import { Modal, Card, Button } from "react-bootstrap";
+import { Card, Modal, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import DataTable from "../../components/DataTable";
 import Http from "../../services/Http";
 
-const SubTopics = () => {
+const Topics = () => {
     const [isGetData, setIsGetData] = useState(0);
     const [data, setData] = useState([]);
     const [sort, setSort] = useState();
     const [search, setSearch] = useState("");
     const [pagination, setPagination] = useState({ page: 1, totalCount: 0, pageSize: 10 });
+    const [module, setModule] = useState({});
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
     const columns = [{
         key: "_id",
         name: "No",
@@ -19,42 +21,40 @@ const SubTopics = () => {
     }, {
         key: "name",
         name: "Name",
+        width: 180
     }, {
         key: "year",
         name: "Year",
-        render: (rowData, idx) => rowData.topic.module.subject.year.name
+        render: (rowData, idx) => rowData.subject.year.name,
+        width: 100
     }, {
         key: "subject",
         name: "Subject",
-        render: (rowData, idx) => rowData.topic.module.subject.name
+        render: (rowData, idx) => rowData.subject.name,
+        width: 200
     }, {
-        key: "module",
-        name: "Module",
-        render: (rowData, idx) => rowData.topic.module.name
-    }, {
-        key: "topic",
-        name: "Topic",
-        render: (rowData, idx) => rowData.topic.name,
+        key: "description",
+        name: "Description",
+        render: (rowData, idx) => <div className="topic-description" dangerouslySetInnerHTML={{__html: rowData.description }}></div>,
+        sortable: false
     }, {
         key: "action",
         name: "Action",
+        width: 90,
         render: (rowData, idx) => (
             <div>
-                <Link className="btn btn-sm btn-outline-success me-1" to={`/admin/sub-topics/edit/${rowData._id}`}>
+                <Link className="btn btn-sm btn-outline-success me-1" to={`/admin/modules/edit/${rowData._id}`}>
                     <i className="fa fa-edit"></i>
                 </Link>
-                <Button variant="btn btn-sm btn-outline-danger" size="sm" onClick={() => removeSubTopic(rowData)}><i className="fa fa-trash"></i></Button>
+                <Button variant="btn btn-sm btn-outline-danger" size="sm" onClick={() => removeModule(rowData)}><i className="fa fa-trash"></i></Button>
             </div>
         ),
-        sortable: false,
-        width: 90
+        sortable: false
     }];
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [subTopic, setSubTopic] = useState({});
 
     useEffect(() => {
-        const getSubTopics = async () => {
-            let { data } = await Http.get("admin/sub-topics", {
+        (async () => {
+            let { data } = await Http.get("admin/modules", {
                 params: {
                     search: search,
                     length: pagination.pageSize,
@@ -65,25 +65,22 @@ const SubTopics = () => {
             });
             setData(data.data);
             setPagination({...pagination, totalCount: data.totalCount});
-        }
-        getSubTopics();
+        })();
     }, [isGetData]);
-
+    
     const onChange = ({search, pagination, sort}) => {
         setSort(sort);
         setSearch(search);
         setPagination(pagination);
         setIsGetData(!isGetData);
     }
-
-    const removeSubTopic = (subTopic) => {
-        setSubTopic(subTopic);
+    const removeModule = (topic) => {
+        setModule(topic);
         setShowDeleteModal(true);
     }
-
-    const deleteSubTopic = async () => {
-        let { data } = await Http.delete(`admin/sub-topics/${subTopic._id}`);
-        if (data.success) {
+    const deleteModule = async () => {
+        let { data } = await Http.delete(`admin/modules/${module._id}`);
+        if (data.status) {
             setIsGetData(!isGetData);
             setShowDeleteModal(false);
             toast.success(data.msg);
@@ -94,9 +91,11 @@ const SubTopics = () => {
     return (
         <Card>
             <Card.Header style={{background: '#3c4b64'}} bsPrefix="card-header py-3">
-                <Card.Title as="h1" bsPrefix="card-title text-light mb-0" style={{fontSize: 24}}>
-                    Subtopics management
-                    <Link className="btn btn-primary btn-sm float-end" to={'/admin/sub-topics/create'}><i className="fa fa-plus"></i> New subtopic</Link>
+                <Card.Title as="h5" bsPrefix="card-title text-light mb-0">
+                    Module management
+                    <Link to="/admin/modules/create" className="btn btn-primary btn-sm float-end">
+                        <i className="fa fa-plus"></i> New module
+                    </Link>
                 </Card.Title>
             </Card.Header>
             <Card.Body>
@@ -104,6 +103,7 @@ const SubTopics = () => {
                     columns={columns}
                     data={data}
                     sort={sort}
+                    search={search}
                     pagination={pagination}
                     onChange={onChange}
                 />
@@ -116,7 +116,7 @@ const SubTopics = () => {
                     Deleting is permanent and cannot be undone.
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="primary" onClick={deleteSubTopic}><i className="fa fa-thumbs-up"></i> Yes</Button>
+                    <Button variant="primary" onClick={deleteModule}><i className="fa fa-thumbs-up"></i> Yes</Button>
                     <Button variant="danger" onClick={() => setShowDeleteModal(false)}><i className="fa fa-thumbs-down"></i> No</Button>
                 </Modal.Footer>
             </Modal>
@@ -124,4 +124,4 @@ const SubTopics = () => {
     )
 }
 
-export default SubTopics;
+export default Topics;

@@ -13,11 +13,12 @@ const SubTopics = () => {
     useEffect(() => {
         document.title = "AnswerSheet - HSC made easy";
         const getTopic = async () => {
-            let { year, subject, topic } = params;
+            let { year, subject, module, topic } = params;
             let { data } = await Http.get(`topics/get-topic-by-slug`, {
                 params: {
                     year_slug: year,
                     subject_slug: subject,
+                    module_slug: module,
                     topic_slug: topic
                 }
             });
@@ -42,7 +43,7 @@ const SubTopics = () => {
                             {
                                 topic.subTopics && topic.subTopics.map((topic, idx) => (
                                     <div className="d-grid" key={idx}>
-                                        <Link className="btn btn-primary learn-btn" to={`/${params.year}/${params.subject}/${params.topic}/${topic.slug}`}>
+                                        <Link className="btn btn-primary learn-btn" to={`/${params.year}/${params.subject}/${params.module}/${params.topic}/${topic.slug}`}>
                                             <img src={TopicIcon} alt="Icon"/> <span>{topic.name}</span>
                                         </Link>
                                     </div>
