@@ -169,7 +169,7 @@ const MembershipPricing = () => {
         style={{ background: '#3c4b64' }}
         bsPrefix='card-header py-3'
       >
-        <Card.Title as='h5' bsPrefix='card-title mb-0 text-light'>
+        <Card.Title as='h1' bsPrefix='card-title mb-0 text-light' style={{fontSize: 24}}>
           Membership pricing
           <Button
             variant='primary'

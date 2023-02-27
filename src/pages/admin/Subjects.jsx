@@ -91,7 +91,7 @@ const Subjects = () => {
     return (
         <Card>
             <Card.Header style={{background: '#3c4b64'}} bsPrefix="card-header py-3">
-                <Card.Title as="h5" bsPrefix="mb-0 card-title text-light">
+                <Card.Title as="h1" bsPrefix="mb-0 card-title text-light" style={{fontSize: 24}}>
                     Subjects management
                     <Link to="/admin/subjects/create" className="btn btn-primary btn-sm float-end"><i className="fa fa-plus"></i> New subject</Link>
                 </Card.Title>

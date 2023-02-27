@@ -34,7 +34,7 @@ const Topics = () => {
             <Container>
                 <Card className="mb-4">
                     <Card.Body className="pt-5 px-5 pb-4">
-                        <h2 className="subject-title">{subject.name}</h2>
+                        <h1 className="subject-title">{subject.name}</h1>
                         { subject.description && <p>{subject.description}</p>}
                         <div className="topic-list">
                             {

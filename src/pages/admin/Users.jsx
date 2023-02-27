@@ -126,7 +126,7 @@ const Users = () => {
     return (
         <Card>
             <Card.Header style={{background: '#3c4b64'}} bsPrefix="card-header py-3">
-                <Card.Title as="h5" bsPrefix="mb-0 card-title text-light">Users management</Card.Title>
+                <Card.Title as="h1" bsPrefix="mb-0 card-title text-light" style={{fontSize: 24}}>Users management</Card.Title>
             </Card.Header>
             <Card.Body>
                 <DataTable 

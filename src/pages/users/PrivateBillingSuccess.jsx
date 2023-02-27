@@ -45,7 +45,7 @@ const PrivateBillingSuccess = () => {
                     }
                 }
             }, 2500);
-            navigate('/private-membership');
+            navigate('/current-membership');
         }
         setPrivateBillingTransaction();
     }, []);

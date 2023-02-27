@@ -11,8 +11,8 @@ import "./Invoice.css";
 const Invoice = () => {
     const ref = useRef(0);
     const { id } = useParams();
-    const [ invoice, setInvoice ] = useState();
-    const [pdfDemension, setPdfDemension ] = useState([]);
+    const [invoice, setInvoice] = useState();
+    const [pdfDemension, setPdfDemension] = useState([]);
     useEffect(() => {
         document.title = 'AnswerSheet - Invoice';
         const getInvoice = async () => {
@@ -28,7 +28,7 @@ const Invoice = () => {
 
     useEffect(() => {
         const resizeListener = () => {
-            let pdfWidth = ref.current.clientWidth; 
+            let pdfWidth = ref.current.clientWidth;
             let pdfHeight = ref.current.clientHeight;
             let pdfWidthInch = pdfWidth * 0.01 + 1;
             let pdfHeightInch = pdfHeight * 0.01 + .75;
@@ -47,26 +47,26 @@ const Invoice = () => {
     }
     return (
         <div className="invoice-container">
-            <Container className="py-3" style={{position: 'relative'}}>
-                <div style={{position: 'absolute', right: 40, zIndex: 1, top: 40}}>
-                    {invoice && <Pdf 
-                        targetRef={ref} 
-                        filename={invoice.invoice_id + ".pdf"} 
+            <Container className="py-3" style={{ position: 'relative' }}>
+                <div style={{ position: 'absolute', right: 40, zIndex: 1, top: 40 }}>
+                    {invoice && <Pdf
+                        targetRef={ref}
+                        filename={"INV-" + invoice.invoice_id + ".pdf"}
                         options={options}
                         x={0.25}
                         y={0.25}
-                        >
-                        {({toPdf}) => {
+                    >
+                        {({ toPdf }) => {
                             return (
-                            <Button variant="default" size="sm" className="mx-1" onClick={toPdf}>
-                                <img src={require("../../assets/images/pdf_icon.png")} height="18" alt="PDF"/> <span>PDF</span>
-                            </Button>
+                                <Button variant="default" size="sm" className="mx-1" onClick={toPdf}>
+                                    <img src={require("../../assets/images/pdf_icon.png")} height="18" alt="PDF" /> <span>PDF</span>
+                                </Button>
                             )
                         }}
                     </Pdf>
                     }
                     {invoice && <CSVLink
-                        filename={invoice.invoice_id + ".csv"}
+                        filename={"INV-" + invoice.invoice_id + ".csv"}
                         headers={[{
                             label: "Date",
                             key: "paid_date"
@@ -91,25 +91,25 @@ const Invoice = () => {
                         }, {
                             label: "To",
                             key: "to"
-                        }]} 
+                        }]}
                         data={[{
                             paid_date: moment(invoice.paid_date).format("DD MMM YYYY HH:mm:ss"),
-                            invoice_id: invoice.invoice_id,
+                            invoice_id: "INV-" + invoice.invoice_id,
                             total: Number(invoice.amount).toFixed(2),
                             sub_total: Number(invoice.amount - invoice.gst).toFixed(2),
                             gst: Number(invoice.gst).toFixed(2),
                             item_name: invoice.item_name,
                             item_description: invoice.item_description,
                             to: invoice.company
-                        }]}  
-                        className="btn btn-default btn-sm"> 
-                        <img src={require("../../assets/images/csv_icon.png")} height="18" alt="CSV"/> <span>CSV</span>
+                        }]}
+                        className="btn btn-default btn-sm">
+                        <img src={require("../../assets/images/csv_icon.png")} height="18" alt="CSV" /> <span>CSV</span>
                     </CSVLink>}
                 </div>
                 <div ref={ref}>
                     <Card className="mb-3">
                         <Card.Body className="p-4">
-                            <h3 className="page-title mb-4">Tax Invoice</h3>
+                            <h1 className="page-title mb-4">Tax Invoice</h1>
                             {
                                 invoice &&
                                 <div className="d-flex justify-content-between invoice-content">
@@ -119,7 +119,7 @@ const Invoice = () => {
                                         <div className="description-items">
                                             <div className="description-item">
                                                 <div className="description-item-name">Invoice number</div>
-                                                <div className="description-item-value">{invoice.invoice_id}</div>
+                                                <div className="description-item-value">{"INV-" + invoice.invoice_id}</div>
                                             </div>
                                             <div className="description-item">
                                                 <div className="description-item-name">Paid date</div>
@@ -149,8 +149,8 @@ const Invoice = () => {
                             invoice &&
                             <Card.Body className="p-4 item-description-container">
                                 <div className="d-flex justify-content-between align-items-center mb-3">
-                                    <div className="item-description-title"><img style={{verticalAlign: "middle"}} src={require("../../assets/images/bar_sort_icon.png")} height="14" alt="Bar Sort" className="me-2"/> Item description</div>
-                                    <div className="item-description-title"><img style={{verticalAlign: "middle"}} src={require("../../assets/images/card_icon.png")} height="25" alt="Card" className="me-2"/> Amount</div>
+                                    <div className="item-description-title"><img style={{ verticalAlign: "middle" }} src={require("../../assets/images/bar_sort_icon.png")} height="14" alt="Bar Sort" className="me-2" /> Item description</div>
+                                    <div className="item-description-title"><img style={{ verticalAlign: "middle" }} src={require("../../assets/images/card_icon.png")} height="25" alt="Card" className="me-2" /> Amount</div>
                                 </div>
                                 <div className="d-flex justify-content-between item-description-content mb-4">
                                     <div>
@@ -162,11 +162,11 @@ const Invoice = () => {
                                 <div className="invoice-billing-info">
                                     <div className="invoice-billing-left-info">
                                         <div>
-                                            <div>Sub total</div> 
+                                            <div>Sub total</div>
                                             <div>{Number(invoice.amount - invoice.gst).toFixed(2)}</div>
                                         </div>
                                         <div>
-                                            <div>Total GST 10%</div> 
+                                            <div>Total GST 10%</div>
                                             <div>{Number(invoice.gst).toFixed(2)}</div>
                                         </div>
                                     </div>

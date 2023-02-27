@@ -30,7 +30,8 @@ const TermsAndConditions = React.lazy(() =>
 )
 const ConfirmEmail = React.lazy(() => import('../../pages/users/ConfirmEmail'));
 const ConfirmContact = React.lazy(() => import('../../pages/users/ConfirmContact'));
-const VerifyEmail = React.lazy(() => import('../../pages/users/VerifyEmail'))
+const VerifyEmail = React.lazy(() => import('../../pages/users/VerifyEmail'));
+const PremiumVerifyEmail = React.lazy(() => import('../../pages/users/PremiumVerifyEmail'));
 const VerifyChangedEmail = React.lazy(() => import('../../pages/users/VerifyChangedEmail'));
 const Profile = React.lazy(() => import('../../pages/users/Profile'))
 const Invoices = React.lazy(() => import('../../pages/users/Invoices'))
@@ -200,6 +201,13 @@ const AppContent = () => {
       private: false
     },
     {
+      path: '/premium-verify-email/:token',
+      exact: false,
+      name: 'Premium verify email',
+      element: PremiumVerifyEmail,
+      private: false
+    },
+    {
       path: 'verify-changed-email/:token',
       exact: false,
       name: 'Verify changed email',
@@ -214,7 +222,7 @@ const AppContent = () => {
       private: true
     },
     {
-      path: '/private-membership',
+      path: '/current-membership',
       exact: true,
       name: 'Private membership',
       element: PrivateMembership,

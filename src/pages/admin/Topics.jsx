@@ -93,7 +93,7 @@ const Topics = () => {
     return (
         <Card>
             <Card.Header style={{background: '#3c4b64'}} bsPrefix="card-header py-3">
-                <Card.Title as="h5" bsPrefix="card-title text-light mb-0">
+                <Card.Title as="h1" bsPrefix="card-title text-light mb-0" style={{fontSize: 24}}>
                     Topics management
                     <Link to="/admin/topics/create" className="btn btn-primary btn-sm float-end">
                         <i className="fa fa-plus"></i> New topic

@@ -112,7 +112,7 @@ const Lecture = () => {
       <Container>
         <Card className='mb-4'>
           <Card.Body className='pt-5 px-5 pb-4' id="content">
-            <h2 className='lecture-title'>{subTopic.name}</h2>
+            <h1 className='lecture-title'>{subTopic.name}</h1>
             <div
               ref={mathRef}
               className='mt-3 lecture-content'

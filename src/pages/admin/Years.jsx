@@ -168,7 +168,7 @@ const Years = () => {
     return (
         <Card>
             <Card.Header style={{ background: '#3c4b64' }} bsPrefix="card-header py-3">
-                <Card.Title bsPrefix="card-title mb-0 text-light" as="h5">
+                <Card.Title bsPrefix="card-title mb-0 text-light" as="h1" style={{fontSize: 24}}>
                     Years management
                     <Button variant="primary"
                         size="sm"

@@ -273,24 +273,24 @@ const CreateSubTopic = () => {
                       'alignright alignjustify | bullist numlist outdent indent | ' +
                       'removeformat | grid_insert | tiny_mce_wiris_formulaEditor tiny_mce_wiris_formulaEditorChemistry | help',
                     draggable_modal: true,
-                    init_instance_callback: function(editor) {
-                        editor.contentWindow.addEventListener("copy", function(ev) {
-                            ev.preventDefault()
-                        });
-                        editor.contentWindow.addEventListener("paste", function(ev) {
-                            ev.preventDefault();
-                        });
-                        editor.contentWindow.addEventListener("keydown", function(ev) {
-                            if((ev.ctrlKey || ev.metaKey) && (ev.key === "p" || ev.charCode === 16 || ev.charCode === 112 || ev.keyCode === 80) ){
-                                ev.cancelBubble = true;
-                                ev.preventDefault();
-                                ev.stopImmediatePropagation();
-                            }  
-                        })
+                    // init_instance_callback: function(editor) {
+                    //     editor.contentWindow.addEventListener("copy", function(ev) {
+                    //         ev.preventDefault()
+                    //     });
+                    //     editor.contentWindow.addEventListener("paste", function(ev) {
+                    //         ev.preventDefault();
+                    //     });
+                    //     editor.contentWindow.addEventListener("keydown", function(ev) {
+                    //         if((ev.ctrlKey || ev.metaKey) && (ev.key === "p" || ev.charCode === 16 || ev.charCode === 112 || ev.keyCode === 80) ){
+                    //             ev.cancelBubble = true;
+                    //             ev.preventDefault();
+                    //             ev.stopImmediatePropagation();
+                    //         }  
+                    //     })
                         
-                    },
+                    // },
                     content_style:
-                      'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+                      'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
                   }}
                   name='description'
                 />

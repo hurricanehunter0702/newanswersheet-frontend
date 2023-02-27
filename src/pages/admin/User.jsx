@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import Http from '../../services/Http'
-import { Card, Table, Form, Row, Col, Button, Modal, Accordion } from 'react-bootstrap'
+import { Card, Table, Form, Row, Col, Button, Modal, Accordion, InputGroup } from 'react-bootstrap'
 import { Formik } from 'formik'
 import * as yup from 'yup'
 import moment from 'moment'
@@ -10,20 +10,24 @@ import './User.css';
 
 const User = () => {
   const params = useParams()
-  const [user, setUser] = useState({
-    firstName: '',
-    lastName: '',
-    email: ''
-  });
-  const [passwords, setPasswords] = useState({
-    password: "",
-    confirmPassword: ""
-  });
-  const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState({ firstName: '', lastName: '', email: '' });
+  const [passwords, setPasswords] = useState({ password: "", confirmPassword: "" });
   const [years, setYears] = useState([]);
-  const [memberships, setMemberships] = useState({})
-  const [invoices, setInvoices] = useState([])
-  const [selectedSubjects, setSelectedSubjects] = useState([])
+  const [userMemberships, setUserMemberships] = useState({});
+  const [memberships, setMemberships] = useState({});
+  const [selectedSubjects, setSelectedSubjects] = useState([]);
+  const [selectedMembership, setSelectedMembership] = useState({});
+  const [selectedInvoice, setSelectedInvoice] = useState(0);
+  const [invoiceIsOpen, setInvoiceIsOpen] = useState(false);
+  const [invoiceIsEdited, setInvoiceIsEdited] = useState(false);
+  const [removeInvoiceIdx, setRemoveInvoiceIdx] = useState(0);
+  const [invoiceIdx, setInvoiceIdx] = useState(0);
+  const [invoices, setInvoices] = useState([]);
+  const [invoice, setInvoice] = useState({});
+  const [invocieModalOpen, setInvoiceModalOpen] = useState(false);
+  const [membershipIsOpen, setMembershipIsOpen] = useState(false);
+  const [removeModalIsOpen, setRemoveModalIsOpen] = useState(false);
+  const [removeType, setRemoveType] = useState('');
 
   const validationProfileSchema = yup.object({
     firstName: yup.string().required('First name is required.'),
@@ -33,7 +37,6 @@ const User = () => {
       .email('Enter a vaild email.')
       .required('Email is required.')
   });
-
   const validationPasswordsSchema = yup.object({
     password: yup
       .string()
@@ -46,6 +49,12 @@ const User = () => {
         return this.parent.password === value
       })
   })
+  const validationInvoiceSchema = yup.object({
+    paidDate: yup.date('Enter paid date.')
+      .required('Please enter a name.'),
+    subtotal: yup.number()
+      .required('Required field.')
+  });
 
   useEffect(() => {
     const getUser = async () => {
@@ -55,13 +64,12 @@ const User = () => {
         firstName: data.user.firstName,
         lastName: data.user.lastName,
         email: data.user.email
-      })
-      setMemberships(data.memberships)
+      });
+      setUserMemberships(data.memberships)
       setInvoices(data.invoices)
     }
     getUser()
   }, []);
-
   useEffect(() => {
     const getYears = async () => {
       let { data } = await Http.get('years')
@@ -73,12 +81,22 @@ const User = () => {
     }
     getYears()
   }, [])
+  useEffect(() => {
+    const getMemberships = async () => {
+      let { data } = await Http.get('memberships');
+      if (data.success) {
+        setMemberships(data.memberships)
+      } else {
+        toast.error(data.msg)
+      }
+    }
+    getMemberships()
+  }, [])
 
   const selectSubject = (subject, year) => {
     let subjects = [...selectedSubjects]
     let find = subjects.indexOf(subject)
     if (find > -1) {
-      console.log(subjects);
       subjects.splice(find, 1)
     } else {
       subject.year_name = year.name;
@@ -101,7 +119,6 @@ const User = () => {
       toast.error(data.msg);
     }
   }
-
   const updatePassword = async (passwords, { resetForm }) => {
     let { data } = await Http.put(`admin/users/${params.id}/password`, {
       password: passwords.password
@@ -113,8 +130,88 @@ const User = () => {
       toast.error(data.msg);
     }
   }
-  const onAddMembership = () => {
-    console.log("ADDMEMBERSHIP")
+
+  const onAddInvoice = async (invoice_, { resetForm }) => {
+    let { data } = await Http.post(`admin/users/${params.id}/invoice`, invoice_);
+    if (data.success) {
+      toast.success(data.msg);
+      setInvoices([...invoices, data.data]);
+      resetForm();
+      setInvoiceIsOpen(false);
+    } else {
+      toast.error(data.msg);
+    }
+  }
+  const viewInvoice = idx => {
+    console.log(idx)
+    setInvoice(invoices[idx]);
+    setInvoiceModalOpen(true);
+  }
+  const onEditInvoice = async (invoice_, { resetForm }) => {
+    let { data } = await Http.put(`admin/users/${params.id}/invoice`, invoice_);
+    if (data.success) {
+      toast.success(data.msg);
+      let newInvoices = invoices.map((_invoice, idx) => {
+        if (idx === invoice_.invoiceIdx) {
+          return data.data
+        } else {
+          return _invoice;
+        }
+      });
+      setInvoices(newInvoices);
+      resetForm();
+      setInvoiceIsOpen(false);
+    } else {
+      toast.error(data.msg);
+    }
+  }
+  const invoiceModal = (isEdited, idx) => {
+    setInvoiceIsEdited(isEdited);
+    setInvoiceIdx(idx);
+    setInvoiceIsOpen(true);
+    console.log(invoices)
+  }
+  const removeInvoice = async (idx) => {
+    console.log(invoices[idx])
+    let invoiceId = invoices[idx]._id;
+    let { data } = await Http.delete(`admin/users/${params.id}/invoice/${invoiceId}`);
+    if (data.success) {
+      toast.success(data.msg);
+      let temp = invoices;
+      temp.splice(idx, 1)
+      setInvoices(temp);
+      setRemoveModalIsOpen(false);
+    } else {
+      toast.error(data.msg);
+    }
+  }
+
+  const addMembership = async () => {
+    console.log(selectedSubjects, selectedMembership, selectedInvoice)
+    let { data } = await Http.post(`admin/users/${params.id}/membership`, {
+      selectedSubjects,
+      selectedInvoice,
+      selectedMembership
+    });
+    if (data.success) {
+      toast.success(data.msg);
+      setUserMemberships([...userMemberships, data.data]);
+      onHideMembershipModal();
+    } else {
+      toast.error(data.msg);
+      onHideMembershipModal();
+    }
+  }
+  const onHideMembershipModal = () => {
+    setSelectedInvoice('');
+    setSelectedMembership('');
+    setSelectedSubjects([]);
+    setMembershipIsOpen(false)
+  }
+  const removeModal = (type, idx) => {
+    setRemoveType(type)
+    setRemoveInvoiceIdx(idx);
+    setRemoveModalIsOpen(true);
   }
 
   return (
@@ -125,7 +222,7 @@ const User = () => {
             style={{ background: '#3c4b64' }}
             bsPrefix='card-header py-3'
           >
-            <Card.Title as='h5' bsPrefix='mb-0 card-title text-light'>
+            <Card.Title as='h1' style={{ fontSize: 24 }} bsPrefix='mb-0 card-title text-light'>
               User profile
             </Card.Title>
           </Card.Header>
@@ -205,7 +302,7 @@ const User = () => {
             style={{ background: '#3c4b64' }}
             bsPrefix='card-header py-3'
           >
-            <Card.Title as='h5' bsPrefix='mb-0 card-title text-light'>
+            <Card.Title as='h1' style={{ fontSize: 24 }} bsPrefix='mb-0 card-title text-light'>
               Change password
             </Card.Title>
           </Card.Header>
@@ -258,7 +355,7 @@ const User = () => {
             style={{ background: '#3c4b64' }}
             bsPrefix='card-header py-3'
           >
-            <Card.Title as='h5' bsPrefix='mb-0 card-title text-light'>
+            <Card.Title as='h1' style={{ fontSize: 24 }} bsPrefix='mb-0 card-title text-light'>
               Invoice histories
             </Card.Title>
           </Card.Header>
@@ -282,11 +379,11 @@ const User = () => {
                 {invoices.length ? (
                   invoices.map((invoice, idx) => (
                     <tr key={idx}>
-                      <td>{invoice._id}</td>
+                      <td>INV-{invoice.invoice_id}</td>
                       <td>
-                        <Button variant="success" size="sm" className="me-1"><i className="fa fa-eye"></i></Button>
-                        <Button variant="primary" size="sm" className="me-1"><i className="fa fa-edit"></i></Button>
-                        <Button variant="danger" size="sm" className="me-1"><i className="fa fa-trash"></i></Button>
+                        <Button variant="success" size="sm" className="me-1" onClick={() => viewInvoice(idx)}><i className="fa fa-eye"></i></Button>
+                        <Button variant="primary" size="sm" className="me-1" onClick={() => invoiceModal(true, idx)}><i className="fa fa-edit"></i></Button>
+                        <Button variant="danger" size="sm" className="me-1" onClick={() => removeModal('invoice', idx)}><i className="fa fa-trash"></i></Button>
                       </td>
                       <td>${invoice.amount}</td>
                       <td>
@@ -305,6 +402,8 @@ const User = () => {
                 )}
               </tbody>
             </Table>
+            <Button variant="primary" size="sm" className="mt-3" onClick={() => invoiceModal(false)}>
+              <i className="fa fa-plus"></i> Add invoice</Button>
           </Card.Body>
         </Card>
       </Col>
@@ -314,8 +413,8 @@ const User = () => {
             style={{ background: '#3c4b64' }}
             bsPrefix='card-header py-3'
           >
-            <Card.Title as='h5' bsPrefix='mb-0 card-title text-light'>
-              Premium memberships
+            <Card.Title as='h1' style={{ fontSize: 24 }} bsPrefix='mb-0 card-title text-light'>
+              Current memberships
             </Card.Title>
           </Card.Header>
           <Card.Body>
@@ -335,8 +434,8 @@ const User = () => {
                 </tr>
               </thead>
               <tbody className='text-center'>
-                {memberships.length ? (
-                  memberships.map((membership, idx) => (
+                {userMemberships.length ? (
+                  userMemberships.map((membership, idx) => (
                     <tr key={idx}>
                       <td>
                         <ul className='mb-0' style={{ listStyleType: 'none' }}>
@@ -347,11 +446,7 @@ const User = () => {
                           ))}
                         </ul>
                       </td>
-                      <td style={{ verticalAlign: 'middle' }}>
-                        {
-                          invoices[idx]._id
-                        }
-                      </td>
+                      <td style={{ verticalAlign: 'middle' }}>INV-{invoices[idx].invoice_id}</td>
                       <td style={{ verticalAlign: 'middle' }}>
                         {Number(membership.period) === -1
                           ? '-'
@@ -368,109 +463,294 @@ const User = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={2} className='text-danger'>
+                    <td colSpan={4} className='text-danger'>
                       Empty memberships
                     </td>
                   </tr>
                 )}
               </tbody>
             </Table>
-            <Button variant="primary" className="" onClick={() => setIsOpen(true)}><i className="fa fa-plus"></i> Add membership</Button>
-            <Modal
-              show={isOpen}
-              onHide={() => setIsOpen(false)}
-              centered
-              size='lg'
-              className='add-membership-modal'
-            >
-              <Modal.Body className='p-4'>
-                <Modal.Title as='h3' className='mb-2'>
-                  Add membership
-                </Modal.Title>
-                <Formik
-                  validateOnChange={false}
-                  validateOnBlur={false}
-                  onSubmit={onAddMembership}
-                  initialValues={years}
-                  enableReinitialize
-                >
-                  {({ handleSubmit, handleChange, handleBlur, values, touched, errors }) => (
-                    <Form noValidate onSubmit={handleSubmit}>
-                      <div>
-                        <p className='fs-5 fw-400 mb-1'>Subject(s)</p>
-                        <Accordion defaultActiveKey={-1}>
-                          {years.map((year, idx) => (
-                            <Accordion.Item key={idx} eventKey={idx}>
-                              <Accordion.Header>{year.name}</Accordion.Header>
-                              <Accordion.Body>
-                                <ul className='mb-0 nav flex-column'>
-                                  {year.subjects.map((subject, idx) => (
-                                    <li
-                                      key={idx}
-                                      className='py-2'
-                                      onClick={() => selectSubject(subject, year)}
-                                      style={{ cursor: 'pointer' }}
-                                    >
-                                      {subject.name}
-                                      <Form.Check
-                                        inline
-                                        name='subjects'
-                                        className='float-end'
-                                        checked={
-                                          isSelectedSubject(subject) ? true : false
-                                        }
-                                        value={subject}
-                                        onChange={ev => selectSubject(ev.target.value, year)}
-                                      />
-                                    </li>
-                                  ))}
-                                </ul>
-                              </Accordion.Body>
-                            </Accordion.Item>
-                          ))}
-                        </Accordion>
-                      </div>
-                      <Row className="mb-3">
-                        <Col sm={12} lg={6}>
-                          <Form.Select
-                            name="continue-until"
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            value={values.membership}
-                            touched={touched}
-                            isInvalid={!!errors.membership}
-                            className="mb-2"
-                          >
-                            {/* {years.map((year, idx) => <option key={idx} value={year._id}>{year.name}</option>)} */}
-                          </Form.Select>
-                        </Col>
-                        <Col sm={12} lg={6}>
-                          <Form.Select
-                            name="link-invoice"
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            value={values.invoice}
-                            touched={touched}
-                            isInvalid={!!errors.invoice}
-                            className="mb-2"
-                          >
-
-                          </Form.Select>
-                        </Col>
-                      </Row>
-                      <Button variant="primary" type="summit" className="form-control">Add membership</Button>
-                      <button
-                        className='btn-close'
-                        onClick={() => setIsOpen(false)}
-                      ></button>
-                    </Form>
-                  )}
-                </Formik>
-              </Modal.Body>
-            </Modal>
+            <Button variant="primary" size="sm" onClick={() => setMembershipIsOpen(true)}><i className="fa fa-plus"></i> Add membership</Button>
           </Card.Body>
         </Card>
       </Col>
+      <Modal
+        show={membershipIsOpen}
+        onHide={onHideMembershipModal}
+        centered
+        size='lg'
+        className='add-modal'
+      >
+        <Modal.Body className='p-4'>
+          <Modal.Title as='h3' className='mb-2'>
+            Add membership
+          </Modal.Title>
+          <div>
+            <p className='fs-5 fw-400 mb-1'>Subject(s)</p>
+            <Accordion defaultActiveKey={-1}>
+              {years.map((year, idx) => (
+                <Accordion.Item key={idx} eventKey={idx}>
+                  <Accordion.Header>{year.name}</Accordion.Header>
+                  <Accordion.Body>
+                    <ul className='mb-0 nav flex-column'>
+                      {year.subjects.map((subject, idx) => (
+                        <li
+                          key={idx}
+                          className='py-2'
+                          onClick={() => selectSubject(subject, year)}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          {subject.name}
+                          <Form.Check
+                            inline
+                            name='subjects'
+                            className='float-end'
+                            checked={isSelectedSubject(subject) ? true : false}
+                            value={subject}
+                            onChange={ev => selectSubject(ev.target.value, year)}
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  </Accordion.Body>
+                </Accordion.Item>
+              ))}
+            </Accordion>
+          </div>
+          <Row className="mb-3">
+            <Col sm={12} lg={6}>
+              <Form.Select
+                name="continue-until"
+                onChange={ev => setSelectedMembership(ev.target.value)}
+                className="mb-2"
+              >
+                <option>Select membership</option>
+                {memberships.length && memberships.map((membership, idx) => <option key={idx} value={membership._id}>{membership.name}</option>)}
+              </Form.Select>
+            </Col>
+            <Col sm={12} lg={6}>
+              <Form.Select
+                name="link-invoice"
+                className="mb-2"
+                onChange={ev => setSelectedInvoice(ev.target.value)}
+              >
+                <option>Select invoice to link</option>
+                {invoices.map((invoice, idx) => <option key={idx} value={invoice.invoice_id}>INV-{invoice.invoice_id}</option>)}
+              </Form.Select>
+            </Col>
+          </Row>
+          <Button variant="primary" className="form-control" onClick={addMembership}>Add membership</Button>
+          <button
+            className='btn-close'
+            onClick={() => setMembershipIsOpen(false)}
+          ></button>
+        </Modal.Body>
+      </Modal>
+      <Modal
+        show={invoiceIsOpen}
+        onHide={() => setInvoiceIsOpen(false)}
+        centered
+        size='lg'
+        className='add-modal'
+      >
+        <Modal.Body className='p-4'>
+          <Modal.Title as='h3' className='mb-2'>
+            {invoiceIsEdited ? "Edit" : "Add"} invoice
+          </Modal.Title>
+          <Formik
+            validationSchema={validationInvoiceSchema}
+            validateOnChange={false}
+            validateOnBlur={false}
+            onSubmit={invoiceIsEdited ? onEditInvoice : onAddInvoice}
+            initialValues={{
+              invoiceIdx: invoiceIdx,
+              invoiceId: invoiceIsEdited ? invoices[invoiceIdx]._id : null,
+              itemName: invoiceIsEdited ? invoices[invoiceIdx].item_name : '3 Months Membership',
+              paidDate: invoiceIsEdited ? moment(invoices[invoiceIdx].paid_date).format('yyyy-MM-DD HH:mm:SS') : moment(new Date()).format('yyyy-MM-DDTHH:mm:SS'),
+              isPaid: invoiceIsEdited ? (invoices[invoiceIdx].paid_date ? 'paid' : 'notPaid') : 'paid',
+              invoiceDescription: invoiceIsEdited ? invoices[invoiceIdx].item_description : '',
+              subtotal: invoiceIsEdited ? invoices[invoiceIdx].amount : 0
+            }}
+            enableReinitialize={true}
+          >
+            {({ handleSubmit, handleChange, handleBlur, values, touched, errors }) => (
+              <Form noValidate onSubmit={handleSubmit}>
+                <Form.Group>
+                  <Form.Select
+                    className="mb-3"
+                    name="itemName"
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    value={values.itemName}
+                    touched={touched}
+                    isInvalid={!!errors.itemName}>
+                    {memberships.length && memberships.map((membership, idx) => {
+                      return <option key={idx} value={membership.name}>{membership.name}</option>
+                    })}
+                  </Form.Select>
+                  <Form.Control.Feedback type="invalid">{errors.itemName}</Form.Control.Feedback>
+                </Form.Group>
+                <Form.Group>
+                  <InputGroup className="mb-3">
+                    <InputGroup.Text>Paid date</InputGroup.Text>
+                    <Form.Control
+                      type="datetime-local"
+                      name="paidDate"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.paidDate}
+                      touched={touched}
+                      isInvalid={!!errors.paidDate} />
+                  </InputGroup>
+                  <Form.Control.Feedback type="invalid">{errors.paidDate}</Form.Control.Feedback>
+                </Form.Group>
+                <Form.Group>
+                  <Form.Select
+                    className="mb-3"
+                    name="isPaid"
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    value={values.isPaid}
+                    touched={touched}
+                    isInvalid={!!errors.isPaid}>
+                    <option value="paid">Paid</option>
+                    <option value="notPaid">Not paid</option>
+                  </Form.Select>
+                  <Form.Control.Feedback type="invalid">{errors.isPaid}</Form.Control.Feedback>
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Control
+                    as="textarea"
+                    placeholder="Please enter a description"
+                    name="invoiceDescription"
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    value={values.invoiceDescription}
+                    rows="4"
+                    touched={touched}
+                  />
+                </Form.Group>
+                <Form.Group>
+                  <InputGroup className="mb-3">
+                    <InputGroup.Text style={{ width: 40 }}><i className="fa fa-dollar"></i></InputGroup.Text>
+                    <Form.Control
+                      type="number"
+                      name="subtotal"
+                      onChange={handleChange}
+                      value={values.subtotal}
+                      isInvalid={!!errors.subtotal}
+                      touched={touched}
+                      placeholder="Subtotal"
+                      onBlur={handleBlur}
+                    />
+                  </InputGroup>
+                  <Form.Control.Feedback type="invalid">{errors.subtotal}</Form.Control.Feedback>
+                </Form.Group>
+                <Button variant="primary" type="summit" className="form-control">{invoiceIsEdited ? 'Edit' : 'Add'} invoice</Button>
+              </Form>
+            )}
+          </Formik>
+          <button
+            className='btn-close'
+            onClick={() => setInvoiceIsOpen(false)}
+          ></button>
+        </Modal.Body>
+      </Modal>
+      <Modal show={removeModalIsOpen} className="remove-modal">
+        <Modal.Body>
+          <Modal.Title>
+            <h1 style={{ fontSize: 24 }}>Are you sure?</h1>
+          </Modal.Title>
+          <p>You are going to remove an invoice. Continue?</p>
+          <Form.Group style={{ float: 'right' }}>
+            <Button size="sm" variant="danger" className="me-2" onClick={() => removeInvoice(removeInvoiceIdx)}>Yes</Button>
+            <Button size="sm" variant="primary" onClick={() => setRemoveModalIsOpen(false)}>No</Button>
+          </Form.Group>
+          <button
+            className='btn-close'
+            onClick={() => setRemoveModalIsOpen(false)}
+          ></button>
+        </Modal.Body>
+      </Modal>
+      <Modal show={invocieModalOpen} className="view-modal" size="xl">
+        <Modal.Body>
+          <Modal.Title>
+            <h1>Tax Invoice</h1>
+          </Modal.Title>
+          {
+            <Card className="mb-3">
+              <Card.Body>
+                <div className="d-flex justify-content-between invoice-content">
+                  <div className="invoice-to mb-2">
+                    <h5 className="text-dark">To</h5>
+                    <h5>{invoice.item_name}</h5>
+                    <div className="description-items">
+                      <div className="description-item">
+                        <div className="description-item-name">Invoice number</div>
+                        <div className="description-item-value">{"INV-" + invoice.invoice_id}</div>
+                      </div>
+                      <div className="description-item">
+                        <div className="description-item-name">Paid date</div>
+                        <div className="description-item-value">{moment(invoice.paid_date).format("DD MMM YYYY")}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="invoice-from mb-2">
+                    <h5 className="text-dark">From</h5>
+                    <Row>
+                      <Col>
+                        <h5>{invoice.company}</h5>
+                        <p className="mb-0">{invoice.address}</p>
+                      </Col>
+                      <Col>
+                        <h5>All billing enquiries</h5>
+                        <p className="mb-0">{invoice.email}</p>
+                      </Col>
+                    </Row>
+                  </div>
+                </div>
+              </Card.Body>
+            </Card>
+          }
+          <Card>
+            {
+              <Card.Body className="p-4 item-description-container">
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                  <div className="item-description-title"><img style={{ verticalAlign: "middle" }} src={require("../../assets/images/bar_sort_icon.png")} height="14" alt="Bar Sort" className="me-2" /> Item description</div>
+                  <div className="item-description-title"><img style={{ verticalAlign: "middle" }} src={require("../../assets/images/card_icon.png")} height="25" alt="Card" className="me-2" /> Amount</div>
+                </div>
+                <div className="d-flex justify-content-between item-description-content mb-4">
+                  <div>
+                    <p className="mb-1">{invoice.item_name}</p>
+                    <p>{invoice.item_description}</p>
+                  </div>
+                  <div>{Number(invoice.amount - invoice.gst).toFixed(2)}</div>
+                </div>
+                <div className="invoice-billing-info">
+                  <div className="invoice-billing-left-info">
+                    <div>
+                      <div>Sub total</div>
+                      <div>{Number(invoice.amount - invoice.gst).toFixed(2)}</div>
+                    </div>
+                    <div>
+                      <div>Total GST 10%</div>
+                      <div>{Number(invoice.gst).toFixed(2)}</div>
+                    </div>
+                  </div>
+                  <div className="invoice-billing-right-info">
+                    <div>Amount due aus</div>
+                    <div>{Number(invoice.amount).toFixed(2)}</div>
+                  </div>
+                </div>
+              </Card.Body>
+            }
+          </Card>
+          <button
+            className='btn-close'
+            onClick={() => setInvoiceModalOpen(false)}
+          ></button>
+        </Modal.Body>
+      </Modal>
     </Row>
   )
 }

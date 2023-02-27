@@ -90,7 +90,7 @@ const SubTopics = () => {
     return (
         <Card>
             <Card.Header style={{background: '#3c4b64'}} bsPrefix="card-header py-3">
-                <Card.Title as="h5" bsPrefix="card-title text-light mb-0">
+                <Card.Title as="h1" bsPrefix="card-title text-light mb-0" style={{fontSize: 24}}>
                     Subtopics management
                     <Link className="btn btn-primary btn-sm float-end" to={'/admin/sub-topics/create'}><i className="fa fa-plus"></i> New subtopic</Link>
                 </Card.Title>
