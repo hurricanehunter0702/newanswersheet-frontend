@@ -7,6 +7,9 @@ const Years = React.lazy(() => import("../../pages/admin/Years"));
 const Subjects = React.lazy(() => import("../../pages/admin/Subjects"));
 const CreateSubject = React.lazy(() => import("../../pages/admin/CreateSubject"));
 const EditSubject = React.lazy(() => import("../../pages/admin/EditSubject"));
+const Modules = React.lazy(() => import("../../pages/admin/Modules"));
+const CreateModule = React.lazy(() => import("../../pages/admin/CreateModule"));
+const EditModule = React.lazy(() => import("../../pages/admin/EditModule"));
 const Topics = React.lazy(() => import("../../pages/admin/Topics"));
 const CreateTopic = React.lazy(() => import("../../pages/admin/CreateTopic"));
 const EditTopic = React.lazy(() => import("../../pages/admin/EditTopic"));
@@ -15,6 +18,7 @@ const CreateSubTopic = React.lazy(() => import("../../pages/admin/CreateSubTopic
 const EditSubTopic = React.lazy(() => import("../../pages/admin/EditSubTopic"));
 const MembershipPricing = React.lazy(() => import("../../pages/admin/MembershipPricing"));
 const Sales = React.lazy(() => import("../../pages/admin/Sales"));
+const Seo = React.lazy(() => import("../../pages/admin/Seo"));
 const Messages = React.lazy(() => import("../../pages/admin/Messages"));
 // const Profile = React.lazy(() => import("../../pages/admin/Profile"));
 const Login = React.lazy(() => import("../../pages/admin/Login"));
@@ -38,6 +42,12 @@ const routes = [{
 }, {
     path: "/subjects/edit/:id", exact: true, name: "Edit Subject", element: EditSubject, private: true, role: 1
 }, {
+    path: "/modules", exact: true, name: "Modules", element: Modules, private: true, role: 1
+}, {
+    path: "/modules/create", exact: true, name: "Create Module", element: CreateModule, private: true, role: 1
+}, {
+    path: "/modules/edit/:id", exact: true, name: "Edit Module", element: EditModule, private: true, role: 1
+}, {
     path: "/topics", exact: true, name: "Topics", element: Topics, private: true, role: 1
 }, {
     path: "/topics/create", exact: true, name: "Create Topic", element: CreateTopic, private: true, role: 1
@@ -53,6 +63,8 @@ const routes = [{
     path: "/sales", exact: true, name: "Sales", element: Sales, private: true, role: 1
 }, {
     path: "/membership-pricing", exact: true, name: "Membership Pricing", element: MembershipPricing, private: true, role: 2
+}, {
+    path: "/seo", exact: true, name: "SEO", element: Seo, private: true, role: 2
 }, {
     path: "/messages", exact: true, name: "Messages", element: Messages, private: true, role: 1
 }, {

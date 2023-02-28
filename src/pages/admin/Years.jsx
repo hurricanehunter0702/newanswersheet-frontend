@@ -96,7 +96,7 @@ const Years = () => {
         let { data } = await Http.post("admin/years", formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         });
-        if (data.success) {
+        if (data.status) {
             toast.success(data.msg);
             setNewVisible(false);
             setIsGetData(!isGetData);
@@ -133,7 +133,7 @@ const Years = () => {
                 'Content-Type': 'multipart/form-data'
             }
         });
-        if (data.success) {
+        if (data.status) {
             toast.success(data.msg);
             setEditVisible(false);
             setFile(null);
@@ -150,7 +150,7 @@ const Years = () => {
 
     const onDelete = async () => {
         let { data } = await Http.delete(`/admin/years/${year._id}`);
-        if (data.success) {
+        if (data.status) {
             toast.success(data.msg);
             setRemoveVisible(false);
             setIsGetData(!isGetData);

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Row, Col, Nav } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap"
 import Http from "../../../../services/Http"
-import { Year11Img, Year12Img, LockImg } from "../../../../services/Assets"
+import { LockImg } from "../../../../services/Assets"
 
 const CategoryList = () => {
     const [years, setYears] = useState([]);
@@ -11,6 +11,7 @@ const CategoryList = () => {
         (async () => {
             let { data } = await Http.get("years")
             setYears(data.data);
+            console.log(data);
         })();
     }, []);
 
@@ -37,7 +38,7 @@ const CategoryList = () => {
                     </div>
                     <div className="category-banner-content">
                       <img
-                        src={idx ? Year12Img : Year11Img}
+                        src={year.image}
                         className="category-banner-img"
                         alt="year-banner"
                       />

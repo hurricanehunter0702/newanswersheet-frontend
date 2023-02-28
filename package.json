@@ -2,6 +2,16 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
+  "proxy": {
+    "/uploads": {
+      "target": "http://localhost:5000/uploads",
+      "changeOrigin": true
+    },
+    "/api": {
+      "target": "http://localhost:5000/api",
+      "changeOrigin": true
+    }
+  },
   "dependencies": {
     "@coreui/chartjs": "^3.0.0",
     "@coreui/coreui": "^4.2.2",

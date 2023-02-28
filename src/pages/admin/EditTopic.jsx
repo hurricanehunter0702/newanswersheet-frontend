@@ -35,7 +35,7 @@ const EditSubject = () => {
         const getTopic = async () => {
             let { id } = params;
             let { data } = await Http.get(`admin/topics/${id}`);
-            if (data.success) {
+            if (data.status) {
                 setTopic({
                     ...topic, 
                     year: data.data.subject.year._id, 
@@ -69,7 +69,7 @@ const EditSubject = () => {
     const onUpdate = async (topic, { resetForm }) => {
         let { id } = params;
         let { data } = await Http.put(`admin/topics/${id}`, topic);
-        if (data.success) {
+        if (data.status) {
             toast.success(data.msg);
             resetForm();
             navigate("/admin/topics");

@@ -4,15 +4,14 @@ import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import DataTable from "../../components/DataTable";
 import Http from "../../services/Http";
-import "./Subjects.css";
 
-const Subjects = () => {
+const Topics = () => {
     const [isGetData, setIsGetData] = useState(0);
     const [data, setData] = useState([]);
     const [sort, setSort] = useState();
     const [search, setSearch] = useState("");
     const [pagination, setPagination] = useState({ page: 1, totalCount: 0, pageSize: 10 });
-    const [subject, setSubject] = useState({});
+    const [module, setModule] = useState({});
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const columns = [{
         key: "_id",
@@ -20,24 +19,23 @@ const Subjects = () => {
         width: 65,
         render: (rowData, idx) => idx + 1
     }, {
-        key: "icon",
-        name: "Icon",
-        render: (rowData, idx) => rowData.icon ? <img src={rowData.icon} alt="icon" width="30"/> : <></>,
-        width: 50,
-        sortable: false
-    }, {
         key: "name",
         name: "Name",
         width: 180
     }, {
         key: "year",
         name: "Year",
-        render: (rowData, idx) => rowData.year.name,
+        render: (rowData, idx) => rowData.subject.year.name,
         width: 100
+    }, {
+        key: "subject",
+        name: "Subject",
+        render: (rowData, idx) => rowData.subject.name,
+        width: 200
     }, {
         key: "description",
         name: "Description",
-        render: (rowData, idx) => <div className="subject-description" dangerouslySetInnerHTML={{__html: rowData.description }}></div>,
+        render: (rowData, idx) => <div className="topic-description" dangerouslySetInnerHTML={{__html: rowData.description }}></div>,
         sortable: false
     }, {
         key: "action",
@@ -45,15 +43,18 @@ const Subjects = () => {
         width: 90,
         render: (rowData, idx) => (
             <div>
-                <Link className="btn btn-sm btn-outline-success me-1" to={`/admin/subjects/edit/${rowData._id}`}><i className="fa fa-edit"></i></Link>
-                <Button variant="btn btn-sm btn-outline-danger" size="sm" onClick={() => removeSubject(rowData)}><i className="fa fa-trash"></i></Button>
+                <Link className="btn btn-sm btn-outline-success me-1" to={`/admin/modules/edit/${rowData._id}`}>
+                    <i className="fa fa-edit"></i>
+                </Link>
+                <Button variant="btn btn-sm btn-outline-danger" size="sm" onClick={() => removeModule(rowData)}><i className="fa fa-trash"></i></Button>
             </div>
         ),
         sortable: false
     }];
+
     useEffect(() => {
-        const getSubjects = async () => {
-            let { data } = await Http.get("admin/subjects", {
+        (async () => {
+            let { data } = await Http.get("admin/modules", {
                 params: {
                     search: search,
                     length: pagination.pageSize,
@@ -64,22 +65,21 @@ const Subjects = () => {
             });
             setData(data.data);
             setPagination({...pagination, totalCount: data.totalCount});
-        }
-        getSubjects();
+        })();
     }, [isGetData]);
-
+    
     const onChange = ({search, pagination, sort}) => {
         setSort(sort);
         setSearch(search);
         setPagination(pagination);
         setIsGetData(!isGetData);
     }
-    const removeSubject = (subject) => {
-        setSubject(subject);
+    const removeModule = (topic) => {
+        setModule(topic);
         setShowDeleteModal(true);
     }
-    const deleteSubject = async () => {
-        let { data } = await Http.delete(`admin/subjects/${subject._id}`);
+    const deleteModule = async () => {
+        let { data } = await Http.delete(`admin/modules/${module._id}`);
         if (data.status) {
             setIsGetData(!isGetData);
             setShowDeleteModal(false);
@@ -91,9 +91,11 @@ const Subjects = () => {
     return (
         <Card>
             <Card.Header style={{background: '#3c4b64'}} bsPrefix="card-header py-3">
-                <Card.Title as="h5" bsPrefix="mb-0 card-title text-light">
-                    Subjects management
-                    <Link to="/admin/subjects/create" className="btn btn-primary btn-sm float-end"><i className="fa fa-plus"></i> New subject</Link>
+                <Card.Title as="h5" bsPrefix="card-title text-light mb-0">
+                    Module management
+                    <Link to="/admin/modules/create" className="btn btn-primary btn-sm float-end">
+                        <i className="fa fa-plus"></i> New module
+                    </Link>
                 </Card.Title>
             </Card.Header>
             <Card.Body>
@@ -114,12 +116,12 @@ const Subjects = () => {
                     Deleting is permanent and cannot be undone.
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="primary" onClick={deleteSubject}><i className="fa fa-thumbs-up"></i> Yes</Button>
+                    <Button variant="primary" onClick={deleteModule}><i className="fa fa-thumbs-up"></i> Yes</Button>
                     <Button variant="danger" onClick={() => setShowDeleteModal(false)}><i className="fa fa-thumbs-down"></i> No</Button>
                 </Modal.Footer>
             </Modal>
         </Card>
-    );
+    )
 }
 
-export default Subjects;
+export default Topics;
