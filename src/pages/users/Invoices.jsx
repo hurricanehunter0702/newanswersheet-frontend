@@ -15,7 +15,7 @@ const Invoices = () => {
     page: 1,
     totalCount: 0,
     pageSize: 10
-  })
+  });
   const columns = [
     {
       key: '_id',
@@ -83,27 +83,27 @@ const Invoices = () => {
   }
   return (
     <div className='invoices-container py-4'>
-        <Container>
-            <Card className='create-subject-container'>
-                <Card.Header bsPrefix='card-header py-3 bg-white'>
-                <Card.Title bsPrefix='card-title mb-0' as='h2'>
-                    Invoices
-                </Card.Title>
-                </Card.Header>
-                <Card.Body>
-                <DataTable
-                    columns={columns}
-                    data={data}
-                    sort={sort}
-                    search={search}
-                    pagination={pagination}
-                    emptyText='No invoices available'
-                    onRow={onRow}
-                    onChange={onChange}
-                />
-                </Card.Body>
-            </Card>
-        </Container>
+      <Container>
+        <Card className='create-subject-container'>
+          <Card.Header bsPrefix='card-header py-3 bg-white'>
+            <Card.Title bsPrefix='card-title mb-0' as='h2'>
+              Invoices
+            </Card.Title>
+          </Card.Header>
+          <Card.Body>
+            <DataTable
+              columns={columns}
+              data={data}
+              sort={sort}
+              search={search}
+              pagination={pagination}
+              emptyText='No invoices available'
+              onRow={onRow}
+              onChange={onChange}
+            />
+          </Card.Body>
+        </Card>
+      </Container>
     </div>
   )
 }

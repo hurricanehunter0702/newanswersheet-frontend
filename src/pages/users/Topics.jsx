@@ -34,8 +34,8 @@ const Topics = () => {
             <Container>
                 <Card className="mb-4">
                     <Card.Body className="pt-5 px-5 pb-4">
-                        <h2 className="subject-title">{module.name}</h2>
-                        { module.description && <p>{module.description}</p>}
+                        <h1 className="subject-title">{module.name}</h1>
+                        { subject.description && <p>{module.description}</p>}
                         <div className="topic-list">
                             {
                                 module.topics && module.topics.map((topic, idx) => (

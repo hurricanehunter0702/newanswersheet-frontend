@@ -82,7 +82,7 @@ const Login = () => {
                     </div>
                     <div className="page-right-content">
                         <div className="login-form">
-                            <h4 className="page-title">Welcome back</h4>
+                            <h1 className="page-title">Welcome back</h1>
                             <Formik
                                 validationSchema={validationSchema}
                                 validateOnChange={false}

@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify'
 import './PrivateMembership.css'
 import moment from 'moment'
+import { setIn } from 'formik'
 
 const PrivateMembership = () => {
   const dispatch = useDispatch()
@@ -24,12 +25,12 @@ const PrivateMembership = () => {
   const [selectedSubjects, setSelectedSubjects] = useState([])
   const [memberships, setMemberships] = useState([])
   const [membership, setMembership] = useState({ name: '' })
-  const [purchasedMemberships, setPurchasedMemberships] = useState([])
+  const [purchasedMemberships, setPurchasedMemberships] = useState([]);
+  const [invoices, setInvoices] = useState([]);
   const [step, setStep] = useState(1)
   const [paymentType, setPaymentType] = useState('stripe')
   useEffect(() => {
     document.title = 'Join AnswerSheet - affordable HSC support'
-    console.log(navigate);
     const getMemberships = async () => {
       let { data } = await Http.get('memberships')
       setMemberships(data.memberships)
@@ -38,11 +39,19 @@ const PrivateMembership = () => {
   }, [])
   useEffect(() => {
     const getPurchasedMemberships = async () => {
-      let { data } = await Http.get('my-memberships')
-      setPurchasedMemberships(data)
+      let { data } = await Http.get('my-memberships');
+      setPurchasedMemberships(data);
     }
     getPurchasedMemberships()
   }, [])
+  useEffect(() => {
+    const getInvoices = async () => {
+      let { data } = await Http.get('my-invoices');
+      console.log(data)
+      setInvoices(data);
+    }
+    getInvoices();
+  }, []);
 
   useEffect(() => {
     const getYears = async () => {
@@ -132,6 +141,19 @@ const PrivateMembership = () => {
       toast.error(data.msg)
     }
   }
+
+  const emailMe = async (membership, idx) => {
+    console.log(membership, idx)
+    let { data } = await Http.post(`private-billing`, {
+      membership
+    });
+    if (data.success) {
+      toast.success(data.msg);
+    } else {
+      toast.error(data.msg);
+    }
+  }
+  
   return (
     <div className='private-membership-container'>
       <Container>
@@ -181,52 +203,62 @@ const PrivateMembership = () => {
               </div>
             ))}
           </div>
-          {purchasedMemberships.length ? (
-            <Card className='mt-3 mb-4'>
-              <Card.Header style={{ background: '#005492' }}>
-                <Card.Title className='mb-0 text-light'>
-                  Premium memberships
-                </Card.Title>
-              </Card.Header>
-              <Card.Body>
-                <Table
-                  className='my-membership-tbl'
-                  bsPrefix='table table-bordered text-center'
-                >
-                  <thead
-                    style={{ backgroundColor: '#005492', color: '#fafafa' }}
+          <div className="memberships-table">
+            {purchasedMemberships.length ? (
+              <Card className='mt-3 mb-4'>
+                <Card.Header style={{ background: '#005492' }}>
+                  <Card.Title className='mb-0 text-light'>
+                    Current memberships
+                  </Card.Title>
+                </Card.Header>
+                <Card.Body>
+                  <Table
+                    className='my-membership-tbl'
+                    bsPrefix='table table-bordered text-center'
                   >
-                    <tr>
-                      <th>Subjects</th>
-                      <th>End date</th>
-                    </tr>
-                  </thead>
-                  <tbody className='text-center'>
-                    {purchasedMemberships.map((membership, idx) => (
-                      <tr key={idx}>
-                        <td>
-                          <ul className='mb-0'>
-                            {membership.subjects.map((subject, idx) => (
-                              <li key={idx}>
-                                {subject.year.name} - {subject.name}
-                              </li>
-                            ))}
-                          </ul>
-                        </td>
-                        <td style={{ verticalAlign: 'middle' }}>
-                          {Number(membership.period) === -1
-                            ? '-'
-                            : moment(membership.expiredDate).format(
-                                'YYYY.MM.DD HH:mm:ss'
-                              )}
-                        </td>
+                    <thead
+                      style={{ backgroundColor: '#005492', color: '#fafafa' }}
+                    >
+                      <tr>
+                        <th>Subjects</th>
+                        <th>Invoice</th>
+                        <th>Action</th>
+                        <th>Current until</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              </Card.Body>
-            </Card>
-          ) : null}
+                    </thead>
+                    <tbody className='text-center'>
+                      {purchasedMemberships.map((membership, idx) => (
+                        <tr key={idx}>
+                          <td>
+                            <ul className='mb-0'>
+                              {membership.subjects.map((subject, idx) => (
+                                <li key={idx} style={{listStyle: 'none'}}>
+                                  {subject.year.name} - {subject.name}
+                                </li>
+                              ))}
+                            </ul>
+                          </td>
+                          <td>
+                            {"INV-" + invoices[idx].invoice_id}
+                          </td>
+                          <td>
+                            <Button variant='outline-primary' size='sm' onClick={() => emailMe(membership, idx)}>Email me</Button>
+                          </td>
+                          <td style={{ verticalAlign: 'middle' }}>
+                            {Number(membership.period) === -1
+                              ? '-'
+                              : moment(membership.expiredDate).format(
+                                  'YYYY.MM.DD HH:mm:ss'
+                                )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </Card.Body>
+              </Card>
+            ) : null}
+          </div>
         </div>
         <Modal
           show={isOpen}

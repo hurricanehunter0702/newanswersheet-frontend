@@ -9,6 +9,10 @@ export const userSlice = createSlice({
             lastName: "",
             email: ""
         },
+        premiumUser: window.localStorage.getItem("premiumUser") ?
+            JSON.parse(window.localStorage.getItem("premiumUser")) : null,
+        premiumMembership: window.localStorage.getItem("premiumMembership") ?
+            JSON.parse(window.localStorage.getItem("premiumMembership")) : null,
         token: window.localStorage.getItem("token") ? window.localStorage.getItem("token") : "",
         loading: false,
         expandSidebar: false
@@ -51,6 +55,6 @@ export const userSlice = createSlice({
     }
 });
 
-export const { createUser, updateUser, updateMembership, deleteUser, setLoading, updateSidebar } = userSlice.actions;
+export const { createUser, updateUser, updateMembership, deleteUser, setLoading, updateSidebar, createPremiumInfo } = userSlice.actions;
 
 export default userSlice.reducer;

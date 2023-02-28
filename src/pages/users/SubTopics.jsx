@@ -37,7 +37,7 @@ const SubTopics = () => {
             <Container>
                 <Card className="mb-4">
                     <Card.Body className="pt-5 px-5 pb-4">
-                        <h2 className="topic-title">{topic.name}</h2>
+                        <h1 className="topic-title">{topic.name}</h1>
                         { topic.description && <p>{topic.description}</p>}
                         <div className="sub-topic-list">
                             {

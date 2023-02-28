@@ -337,7 +337,7 @@ const CreateSubTopic = () => {
                       'removeformat | grid_insert | tiny_mce_wiris_formulaEditor tiny_mce_wiris_formulaEditorChemistry | help',
                     draggable_modal: true,
                     content_style:
-                      'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+                      'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
                   }}
                   name='description'
                 />

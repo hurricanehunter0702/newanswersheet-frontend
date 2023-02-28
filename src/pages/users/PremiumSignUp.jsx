@@ -75,7 +75,7 @@ const PremiumSignUp = () => {
         //     token: data.token
         // }));
         // navigate("/subjects");
-        await upgradeMembership({ ...data.user, paymentType: user.paymentType })
+        await upgradeMembership({ ...data.user, paymentType: user.paymentType });
       } else {
         // toast.error(data.msg);
         dispatch(setLoading(false))
@@ -87,11 +87,15 @@ const PremiumSignUp = () => {
     }
   });
   const onRegister = async (user, { resetForm }) => {
-    let { data } = await Http.post('register', user)
-    dispatch(setLoading(true))
+    let { data } = await Http.post('premium-register', user);
+    let premiumUser = {...data.user, gateway: 'stripe'};
+    dispatch(setLoading(true));
+    window.localStorage.setItem('premiumUser', JSON.stringify(premiumUser));
+    window.localStorage.setItem('premiumMembership', JSON.stringify(membership));
     if (data.success) {
-      resetForm()
-      await upgradeMembership({ ...data.user, paymentType: user.paymentType })
+      toast.success(data.msg);
+      // resetForm()
+      // await upgradeMembership({ ...data.user, paymentType: user.paymentType })
     } else {
       dispatch(setLoading(false))
       toast.error(data.msg)
@@ -101,11 +105,12 @@ const PremiumSignUp = () => {
     let { data } = await Http.post(`billing/${user.paymentType}`, {
       user,
       membership
-    })
+    });
     if (data.success) {
       dispatch(setLoading(false))
       window.localStorage.removeItem('membership')
       window.location.href = data.redirect_url
+      navigate('/current-membership');
     } else {
       dispatch(setLoading(false))
       toast.error(data.msg)
@@ -124,11 +129,13 @@ const PremiumSignUp = () => {
               validationSchema={validationSchema}
               onSubmit={onRegister}
               initialValues={user}
+              validateOnChange={false}
+              validateOnBlur={false}
             >
               {({ handleSubmit, handleChange, values, touched, errors }) => (
                 <Form noValidate onSubmit={handleSubmit}>
                   <div style={{ width: '100%' }} className='mb-3'>
-                    <h1 className='page-title'>Join Answersheet</h1>
+                    <h1 className='page-title'>Join Answersheet Premium</h1>
                   </div>
                   {Object.keys(membership).length && (
                     <Table bsPrefix='bg-white table table-bordered'>
@@ -136,7 +143,7 @@ const PremiumSignUp = () => {
                         style={{ backgroundColor: '#005492', color: '#fafafa' }}
                       >
                         <tr>
-                          <th>Membership</th>
+                          <th>Premium membership</th>
                           <th>Amount</th>
                         </tr>
                       </thead>
@@ -217,18 +224,8 @@ const PremiumSignUp = () => {
                       onChange={handleChange}
                     />
                   </Form.Group>
-                  <div className="d-grid">
-                    <Button variant="primary" className="google-signup-btn" onClick={googleRegister}>
-                      <LazyLoadImage src={GoogleSvg} alt="google" /> Sign up with Google and buy now
-                    </Button>
-                  </div>
-                  <div style={{ display: "flex", alignItems: 'center', justifyContent: 'center' }}>
-                    <div style={{ flex: 1 }}><hr /></div>
-                    <div className="py-2 px-3 fw-bold text-dark">OR</div>
-                    <div style={{ flex: 1 }}><hr /></div>
-                  </div>
                   <div style={{ width: '100%' }} className='mb-3'>
-                    <h1 className='page-title'>Create premium account</h1>
+                    <h1 className='page-title'>Create an account</h1>
                   </div>
                   <FormInput
                     required
@@ -303,7 +300,17 @@ const PremiumSignUp = () => {
                       type='submit'
                       className='float-end'
                     >
-                      <i className='fa fa-sign-in'></i> Sign up and buy now
+                      <i className='fa fa-sign-in'></i> Sign up and join
+                    </Button>
+                  </div>
+                  <div style={{ display: "flex", alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ flex: 1 }}><hr /></div>
+                    <div className="py-2 px-3 fw-bold text-dark">OR</div>
+                    <div style={{ flex: 1 }}><hr /></div>
+                  </div>
+                  <div className="d-grid">
+                    <Button variant="primary" className="google-signup-btn" type="button" onClick={googleRegister}>
+                      <LazyLoadImage src={GoogleSvg} alt="google" /> Sign up with Google and join
                     </Button>
                   </div>
                 </Form>

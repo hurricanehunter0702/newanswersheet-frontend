@@ -99,9 +99,9 @@ const PremiumMembership = () => {
     <div className='premium-membership-container'>
       <Container>
         <div className='page-content'>
-          <h2 className='page-title mb-3 mb-md-4 text-center'>
+          <h1 className='page-title mb-3 mb-md-4 text-center'>
             Premium membership
-          </h2>
+          </h1>
           <div className='membership-items mb-5'>
             {memberships.map((membership, idx) => (
               <div className='membership-item' key={idx}>
@@ -146,7 +146,7 @@ const PremiumMembership = () => {
               </div>
             ))}
           </div>
-          <h2 className='page-title mb-4 text-center'>Why AnswerSheet?</h2>
+          <h1 className='page-title mb-4 text-center'>Why AnswerSheet?</h1>
           <ul className='why-answersheet-nav mb-4 mb-md-5'>
             <li>
               <LazyLoadImage src={WalletSvg} alt='wallet' />

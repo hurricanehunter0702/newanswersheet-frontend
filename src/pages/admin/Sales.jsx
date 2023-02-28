@@ -210,7 +210,7 @@ const Sales = () => {
         style={{ background: '#3c4b64' }}
         bsPrefix='card-header py-3'
       >
-        <Card.Title as='h5' bsPrefix='mb-0 card-title text-light'>
+        <Card.Title as='h1' bsPrefix='mb-0 card-title text-light' style={{fontSize: 24}}>
           Sales management
         </Card.Title>
       </Card.Header>

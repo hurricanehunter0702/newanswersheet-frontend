@@ -52,7 +52,7 @@ const AppSidebar = () => {
                     </LinkContainer>
                 </Nav.Item>
                 <Nav.Item>
-                    <LinkContainer to="/private-membership">
+                    <LinkContainer to="/current-membership">
                         <Nav.Link>
                             <span className="sidebar-icon">
                                 <img src={MembershipIcon} width="23" alt="membership icon"/>

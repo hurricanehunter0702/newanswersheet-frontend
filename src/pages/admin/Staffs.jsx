@@ -173,7 +173,7 @@ const Staffs = () => {
     return (
         <Card>
             <Card.Header style={{background: '#3c4b64'}} bsPrefix="card-header py-3">
-                <Card.Title as="h5" bsPrefix="mb-0 card-title text-light">
+                <Card.Title as="h1" bsPrefix="mb-0 card-title text-light" style={{fontSize: 24}}>
                     Staff management
                     <Button variant="primary" size="sm" className="float-end" onClick={() => setVisibleNewModal(true)}><i className="fa fa-plus"></i> New staff</Button>
                 </Card.Title>

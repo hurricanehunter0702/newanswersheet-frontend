@@ -30,7 +30,8 @@ const BillingSuccess = () => {
                     paymentId = searchParams.get("session_id");
                     payerId = 0;
                 }
-                let { data } = await Http.get(`billing/${gateway}/return?paymentId=${paymentId}&payerId=${payerId}&historyId=${historyId}`)
+                let { data } = await Http.get(`billing/${gateway}/return?paymentId=${paymentId}&payerId=${payerId}&historyId=${historyId}`);
+                console.log("OOOKKK=====>", data)
                 if (data.success) {
                     setEmail(data.email);
                     setInvoiceId(data.invoiceId);
@@ -45,6 +46,7 @@ const BillingSuccess = () => {
                     }
                 }
             }, 2500);
+            navigate('/current-membership');
         }
         setBillingTransaction();
     }, []);
