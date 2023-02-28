@@ -5,29 +5,20 @@ import AppSidebar from './AppSidebar'
 import './AppContent.css'
 const Home = React.lazy(() => import('../../pages/users/Home'))
 const Subjects = React.lazy(() => import('../../pages/users/Subjects'))
+const Modules = React.lazy(() => import('../../pages/users/Modules'))
 const Topics = React.lazy(() => import('../../pages/users/Topics'))
 const SubTopics = React.lazy(() => import('../../pages/users/SubTopics'))
 const Lecture = React.lazy(() => import('../../pages/users/Lecture'))
 const AboutUs = React.lazy(() => import('../../pages/users/AboutUs'))
-const PremiumMembership = React.lazy(() =>
-  import('../../pages/users/PremiumMembership')
-)
+const PremiumMembership = React.lazy(() => import('../../pages/users/PremiumMembership'))
 const SignUp = React.lazy(() => import('../../pages/users/SignUp'))
 const Login = React.lazy(() => import('../../pages/users/Login'))
-const ForgotPassword = React.lazy(() =>
-  import('../../pages/users/ForgotPassword')
-)
-const ResetPassword = React.lazy(() =>
-  import('../../pages/users/ResetPassword')
-)
+const ForgotPassword = React.lazy(() => import('../../pages/users/ForgotPassword'))
+const ResetPassword = React.lazy(() => import('../../pages/users/ResetPassword'))
 const Faqs = React.lazy(() => import('../../pages/users/Faqs'))
 const ContactUs = React.lazy(() => import('../../pages/users/ContactUs'))
-const PrivacyPolicy = React.lazy(() =>
-  import('../../pages/users/PrivacyPolicy')
-)
-const TermsAndConditions = React.lazy(() =>
-  import('../../pages/users/TermsAndConditions')
-)
+const PrivacyPolicy = React.lazy(() => import('../../pages/users/PrivacyPolicy'))
+const TermsAndConditions = React.lazy(() => import('../../pages/users/TermsAndConditions'))
 const ConfirmEmail = React.lazy(() => import('../../pages/users/ConfirmEmail'));
 const ConfirmContact = React.lazy(() => import('../../pages/users/ConfirmContact'));
 const VerifyEmail = React.lazy(() => import('../../pages/users/VerifyEmail'))
@@ -36,24 +27,12 @@ const Profile = React.lazy(() => import('../../pages/users/Profile'))
 const Invoices = React.lazy(() => import('../../pages/users/Invoices'))
 const Invoice = React.lazy(() => import('../../pages/users/Invoice'))
 const Membership = React.lazy(() => import('../../pages/users/Membership'))
-const PremiumSignUp = React.lazy(() =>
-  import('../../pages/users/PremiumSignUp')
-)
-const PrivateMembership = React.lazy(() =>
-  import('../../pages/users/PrivateMembership')
-)
-const BillingSuccess = React.lazy(() =>
-  import('../../pages/users/BillingSuccess')
-)
-const BillingCancel = React.lazy(() =>
-  import('../../pages/users/BillingCancel')
-)
-const PrivateBillingSuccess = React.lazy(() =>
-  import('../../pages/users/PrivateBillingSuccess')
-)
-const PrivateBillingCancel = React.lazy(() =>
-  import('../../pages/users/PrivateBillingCancel')
-)
+const PremiumSignUp = React.lazy(() => import('../../pages/users/PremiumSignUp'))
+const PrivateMembership = React.lazy(() => import('../../pages/users/PrivateMembership'))
+const BillingSuccess = React.lazy(() => import('../../pages/users/BillingSuccess'))
+const BillingCancel = React.lazy(() => import('../../pages/users/BillingCancel'))
+const PrivateBillingSuccess = React.lazy(() => import('../../pages/users/PrivateBillingSuccess'))
+const PrivateBillingCancel = React.lazy(() => import('../../pages/users/PrivateBillingCancel'))
 
 const UserRoute = ({ user, redirectPath = '/login', children }) => {
   if (user && user.status === true) {
@@ -251,19 +230,26 @@ const AppContent = () => {
     {
       path: '/:year/:subject',
       exact: true,
+      name: "Modules",
+      element: Modules,
+      private: false
+    },
+    {
+      path: '/:year/:subject/:module',
+      exact: true,
       name: 'Topics',
       element: Topics,
       private: false
     },
     {
-      path: '/:year/:subject/:topic',
+      path: "/:year/:subject/:module/:topic",
       exact: true,
-      name: 'Sub topics',
+      name: "Subtopics",
       element: SubTopics,
       private: false
     },
     {
-      path: '/:year/:subject/:topic/:subtopic',
+      path: '/:year/:subject/:module/:topic/:subtopic',
       exact: true,
       name: 'Lecture',
       element: Lecture,

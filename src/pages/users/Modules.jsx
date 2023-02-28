@@ -6,23 +6,22 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import TopicIcon from "../../assets/images/topic_icon.svg";
 import "./Topics.css";
 
-const Topics = () => {
+const Modules = () => {
     const params = useParams(); 
     const navigate = useNavigate();
-    const [module, setModule] = useState({});
+    const [subject, setSubject] = useState({});
     useEffect(() => {
         document.title = "AnswerSheet - HSC made easy";
         (async () => {
-            let { year, subject, module } = params;
-            let { data } = await Http.get(`modules/get-module-by-slug`, {
+            let { year, subject } = params;
+            let { data } = await Http.get(`subjects/get-subject-by-slug`, {
                 params: {
                     year_slug: year, 
-                    subject_slug: subject,
-                    module_slug: module
+                    subject_slug: subject
                 }
             });
             if (data.status) {
-                setModule(data.data);
+                setSubject(data.data);
             } else {
                 toast.error(data.msg);
                 navigate("/subjects");
@@ -34,14 +33,14 @@ const Topics = () => {
             <Container>
                 <Card className="mb-4">
                     <Card.Body className="pt-5 px-5 pb-4">
-                        <h2 className="subject-title">{module.name}</h2>
-                        { module.description && <p>{module.description}</p>}
+                        <h2 className="subject-title">{subject.name}</h2>
+                        { subject.description && <p>{subject.description}</p>}
                         <div className="topic-list">
                             {
-                                module.topics && module.topics.map((topic, idx) => (
+                                subject.modules && subject.modules.map((module, idx) => (
                                     <div className="d-grid" key={idx}>
-                                        <Link className="btn btn-primary learn-btn" to={`/${params.year}/${params.subject}/${params.module}/${topic.slug}`}>
-                                            <img src={TopicIcon} alt="Icon"/> <span>{topic.name}</span>
+                                        <Link className="btn btn-primary learn-btn" to={`/${params.year}/${params.subject}/${module.slug}`}>
+                                            <img src={TopicIcon} alt="Icon"/> <span>{module.name}</span>
                                         </Link>
                                     </div>
                                 ))
@@ -54,4 +53,4 @@ const Topics = () => {
     )
 }
 
-export default Topics;
+export default Modules;

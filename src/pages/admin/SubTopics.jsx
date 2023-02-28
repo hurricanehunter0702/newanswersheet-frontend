@@ -22,11 +22,15 @@ const SubTopics = () => {
     }, {
         key: "year",
         name: "Year",
-        render: (rowData, idx) => rowData.topic.subject.year.name
+        render: (rowData, idx) => rowData.topic.module.subject.year.name
     }, {
         key: "subject",
         name: "Subject",
-        render: (rowData, idx) => rowData.topic.subject.name
+        render: (rowData, idx) => rowData.topic.module.subject.name
+    }, {
+        key: "module",
+        name: "Module",
+        render: (rowData, idx) => rowData.topic.module.name
     }, {
         key: "topic",
         name: "Topic",

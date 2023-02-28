@@ -11,15 +11,14 @@ const Subjects = () => {
     const [years, setYears] = useState([]);
     useEffect(() => {
         document.title = "AnswerSheet - HSC study guides to help you get a band 6";
-        const getYears = async () => {
+        (async () => {
             let { data } = await Http.get("years");
             if (data.success) {
                 setYears(data.data);
             } else {
                 toast.error(data.msg);
             }
-        }
-        getYears();
+        })();
     }, []);
     return (
         <div className="subjects-container">

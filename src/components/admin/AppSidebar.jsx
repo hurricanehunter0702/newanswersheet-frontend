@@ -6,7 +6,7 @@ import { AppSidebarNav } from './AppSidebarNav'
 import logo from "../../assets/images/footer-logo.svg";
 import smallLogo from "../../assets/images/small-logo.svg";
 import CIcon from '@coreui/icons-react'
-import { cilUserPlus, cilVoiceOverRecord, cilLibrary, cilBook, cilLayers, cilEnvelopeLetter, cilChart, cilCash } from '@coreui/icons';
+import { cilUserPlus, cilVoiceOverRecord, cilLibrary, cilBook, cilLayers, cilChart, cilSortAscending, cilCash } from '@coreui/icons';
 import SimpleBar from 'simplebar-react'
 import 'simplebar/dist/simplebar.min.css'
 import { setSidebarUnfoldable } from '../../store/reducers/adminReducer';
@@ -39,6 +39,12 @@ const navigation = [{
   role: 1
 }, {
   component: CNavItem,
+  name: "Modules",
+  to: "/admin/modules",
+  icon: <CIcon icon={cilLayers} customClassName="nav-icon"/>,
+  role: 1
+}, {
+  component: CNavItem,
   name: "Topics",
   to: "/admin/topics",
   icon: <CIcon icon={cilLayers} customClassName="nav-icon"/>,
@@ -54,6 +60,12 @@ const navigation = [{
   name: "Membership pricing",
   to: "/admin/membership-pricing",
   icon: <CIcon icon={cilCash} customClassName="nav-icon"/>,
+  role: 2
+}, {
+  component: CNavItem,
+  name: "SEO",
+  to: "/admin/seo",
+  icon: <CIcon icon={cilSortAscending} customClassName="nav-icon"/>,
   role: 2
 }, {
     component: CNavItem,

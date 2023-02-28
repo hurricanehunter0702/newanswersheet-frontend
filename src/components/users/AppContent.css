@@ -1,6 +1,7 @@
 .page-container {
     z-index: 1;
     position: relative;
+    min-height: calc(100vh - 362px);
 }
 .app-sidebar + div {
     flex: 1;

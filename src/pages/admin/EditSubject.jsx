@@ -35,7 +35,7 @@ const EditSubject = () => {
         const getSubject = async () => {
             let { id } = params;
             let { data } = await Http.get(`admin/subjects/${id}`);
-            if (data.success) {
+            if (data.status) {
                 setSubject(data.data);
             } else {
                 toast.error(data.msg);
@@ -60,7 +60,7 @@ const EditSubject = () => {
                 'Content-Type': 'multipart/form-data'
             }
         });
-        if (data.success) {
+        if (data.status) {
             toast.success(data.msg);
             resetForm();
             setFile(null);

@@ -26,12 +26,17 @@ const Topics = () => {
     }, {
         key: "year",
         name: "Year",
-        render: (rowData, idx) => rowData.subject.year.name,
+        render: (rowData, idx) => rowData.module.subject.year.name,
         width: 100
     }, {
         key: "subject",
         name: "Subject",
-        render: (rowData, idx) => rowData.subject.name,
+        render: (rowData, idx) => rowData.module.subject.name,
+        width: 200
+    }, {
+        key: "module",
+        name: "Module",
+        render: (rowData, idx) => rowData.module.name,
         width: 200
     }, {
         key: "description",
@@ -82,7 +87,7 @@ const Topics = () => {
     }
     const deleteTopic = async () => {
         let { data } = await Http.delete(`admin/topics/${topic._id}`);
-        if (data.success) {
+        if (data.status) {
             setIsGetData(!isGetData);
             setShowDeleteModal(false);
             toast.success(data.msg);
